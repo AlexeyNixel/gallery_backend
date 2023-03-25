@@ -15,6 +15,7 @@ export class UsersService {
   async createUser(dto: CreateUserDto): Promise<Users> {
     const newUser = await new this.userModel(dto);
     const role = await this.roleService.getRoleByValue('user');
+    newUser.roles = [role];
     await newUser.set('roles', role);
     return newUser.save();
   }
@@ -22,5 +23,12 @@ export class UsersService {
   async findAll(): Promise<Users[]> {
     const users = await this.userModel.find().populate('roles');
     return users;
+  }
+
+  async getUserByEmail(email: string) {
+    const user = await this.userModel
+      .findOne({ email: email })
+      .populate('roles');
+    return user;
   }
 }
